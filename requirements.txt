@@ -1,7 +1,11 @@
 Flask==0.10.1
+Flask-Sass==0.9
 Jinja2==2.7.2
 MarkupSafe==0.23
 Werkzeug==0.9.4
+bcrypt==1.0.2
+cffi==0.8.2
 gunicorn==18.0
 itsdangerous==0.24
 psycopg2==2.5.3
+pycparser==2.10
