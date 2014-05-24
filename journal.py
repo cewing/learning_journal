@@ -10,7 +10,7 @@ from flask import render_template
 from flask import request
 from flask import session
 from flask import url_for
-from flask.ext.sass import Sass
+# from flask.ext.sass import Sass
 
 
 DB_SCHEMA = """
@@ -133,6 +133,6 @@ def add_entry():
 
 
 if __name__ == '__main__':
-    app.config['SASS_BIN_PATH'] = '/usr/bin/sass'
-    Sass(app)
+    # app.config['SASS_BIN_PATH'] = '/usr/bin/sass'
+    # Sass(app)
     app.run(debug=True)
