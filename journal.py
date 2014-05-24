@@ -1,4 +1,4 @@
-import bcrypt
+# import bcrypt
 from contextlib import closing
 import os
 import psycopg2
@@ -43,7 +43,8 @@ app.config['ADMIN_USERNAME'] = os.environ.get(
     'ADMIN_USERNAME', 'admin'
 )
 app.config['ADMIN_PASSWORD'] = os.environ.get(
-    'ADMIN_PASSWORD', bcrypt.hashpw('admin', bcrypt.gensalt())
+    # 'ADMIN_PASSWORD', bcrypt.hashpw('admin', bcrypt.gensalt())
+    'ADMIN_PASSWORD', 'admin'
 )
 
 def connect_db():
@@ -91,7 +92,8 @@ def do_login(username, passwd):
     if username != app.config['ADMIN_USERNAME']:
         raise ValueError
     hashed = app.config['ADMIN_PASSWORD']
-    if bcrypt.hashpw(passwd, hashed) != hashed:
+    # if bcrypt.hashpw(passwd, hashed) != hashed:
+    if passwd != hashed:
         raise ValueError
     session['logged_in'] = True
 
