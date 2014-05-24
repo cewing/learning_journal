@@ -87,7 +87,6 @@ def get_all_entries():
 
 
 def do_login(username, passwd):
-    import pdb; pdb.set_trace()
     if username != app.config['ADMIN_USERNAME']:
         raise ValueError
     hashed = app.config['ADMIN_PASSWORD']
