@@ -1,6 +1,6 @@
-# import bcrypt
 from contextlib import closing
 import os
+from passlib.hash import pbkdf2_sha256
 import psycopg2
 from flask import abort
 from flask import Flask
@@ -10,7 +10,6 @@ from flask import render_template
 from flask import request
 from flask import session
 from flask import url_for
-# from flask.ext.sass import Sass
 
 
 DB_SCHEMA = """
@@ -43,8 +42,7 @@ app.config['ADMIN_USERNAME'] = os.environ.get(
     'ADMIN_USERNAME', 'admin'
 )
 app.config['ADMIN_PASSWORD'] = os.environ.get(
-    # 'ADMIN_PASSWORD', bcrypt.hashpw('admin', bcrypt.gensalt())
-    'ADMIN_PASSWORD', 'admin'
+    'ADMIN_PASSWORD', pbkdf2_sha256.encrypt('admin')
 )
 
 def connect_db():
@@ -89,11 +87,11 @@ def get_all_entries():
 
 
 def do_login(username, passwd):
+    import pdb; pdb.set_trace()
     if username != app.config['ADMIN_USERNAME']:
         raise ValueError
     hashed = app.config['ADMIN_PASSWORD']
-    # if bcrypt.hashpw(passwd, hashed) != hashed:
-    if passwd != hashed:
+    if not pbkdf2_sha256.verify(passwd, hashed):
         raise ValueError
     session['logged_in'] = True
 
@@ -133,6 +131,7 @@ def add_entry():
 
 
 if __name__ == '__main__':
-    # app.config['SASS_BIN_PATH'] = '/usr/bin/sass'
-    # Sass(app)
+    from flask.ext.sass import Sass
+    app.config['SASS_BIN_PATH'] = '/usr/bin/sass'
+    Sass(app)
     app.run(debug=True)
