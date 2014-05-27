@@ -1,4 +1,5 @@
 from contextlib import closing
+import datetime
 import os
 from passlib.hash import pbkdf2_sha256
 import psycopg2
@@ -17,23 +18,24 @@ DROP TABLE IF EXISTS entries;
 CREATE TABLE entries (
     id serial PRIMARY KEY,
     title VARCHAR (127) NOT NULL,
-    text TEXT
+    text TEXT NOT NULL,
+    date TIMESTAMP NOT NULL
 )
 """
 
 DB_ENTRY_INSERT = """
-INSERT INTO entries (title, text) VALUES (%s, %s)
+INSERT INTO entries (title, text, date) VALUES (%s, %s, %s)
 """
 
 DB_ENTRIES_LIST = """
-SELECT id, title, text FROM entries ORDER BY id DESC
+SELECT id, title, text, date FROM entries ORDER BY id DESC
 """
 
 
 app = Flask(__name__)
 
 app.config['DATABASE'] = os.environ.get(
-    'DATABASE_URL', 'dbname=flask_journal user=cewing'
+    'DATABASE_URL', 'dbname=learning_journal user=cewing'
 )
 app.config['SECRET_KEY'] = os.environ.get(
     'FLASK_SECRET_KEY', 'sooperseekritvaluenooneshouldknow'
@@ -74,7 +76,8 @@ def write_entry(title, text):
         raise ValueError("Title and text required for writing an entry")
     con = get_database_connection()
     cur = con.cursor()
-    cur.execute(DB_ENTRY_INSERT, [title, text])
+    now = datetime.datetime.utcnow()
+    cur.execute(DB_ENTRY_INSERT, [title, text, now])
     con.commit()
 
 
