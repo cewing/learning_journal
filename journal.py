@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from contextlib import closing
 import datetime
 import os
@@ -19,16 +20,16 @@ CREATE TABLE entries (
     id serial PRIMARY KEY,
     title VARCHAR (127) NOT NULL,
     text TEXT NOT NULL,
-    date TIMESTAMP NOT NULL
+    created TIMESTAMP NOT NULL
 )
 """
 
 DB_ENTRY_INSERT = """
-INSERT INTO entries (title, text, date) VALUES (%s, %s, %s)
+INSERT INTO entries (title, text, created) VALUES (%s, %s, %s)
 """
 
 DB_ENTRIES_LIST = """
-SELECT id, title, text, date FROM entries ORDER BY id DESC
+SELECT id, title, text, created FROM entries ORDER BY id DESC
 """
 
 
