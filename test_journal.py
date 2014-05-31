@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from contextlib import closing
+from flask import session
+from flask import url_for
 import pytest
 
 from journal import app
@@ -123,3 +125,58 @@ def test_add_entries(db):
     assert 'No entries here so far' not in actual
     for expected in entry_data.values():
         assert expected in actual
+
+
+def test_do_login_success(req_context):
+    username, password = ('admin', 'admin')
+    from journal import do_login
+    assert 'logged_in' not in session
+    do_login(username, password)
+    assert 'logged_in' in session
+
+
+def test_do_login_bad_password(req_context):
+    username = 'admin'
+    bad_password = 'wrongpassword'
+    from journal import do_login
+    with pytest.raises(ValueError):
+        do_login(username, bad_password)
+
+
+def test_do_login_bad_username(req_context):
+    password = 'admin'
+    bad_username = 'wronguser'
+    from journal import do_login
+    with pytest.raises(ValueError):
+        do_login(bad_username, password)
+
+
+SUBMIT_BTN = '<input type="submit" value="Share" name="Share"/>'
+
+
+def login_helper(username, password):
+    login_data = {
+        'username': username, 'password': password
+    }
+    client = app.test_client()
+    return client.post(
+        '/login', data=login_data, follow_redirects=True
+    )
+
+
+def test_start_as_anonymous(db):
+    client = app.test_client()
+    anon_home = client.get('/').data
+    assert SUBMIT_BTN not in anon_home
+
+
+def test_login_success(db):
+    username, password = ('admin', 'admin')
+    response = login_helper(username, password)
+    assert SUBMIT_BTN in response.data
+
+
+def test_login_fails(db):
+    username, password = ('admin', 'wrong')
+    response = login_helper(username, password)
+    assert 'Login Failed' in response.data
