@@ -110,3 +110,16 @@ def test_listing(with_entry):
     actual = app.test_client().get('/').data
     for value in expected:
         assert value in actual
+
+
+def test_add_entries(db):
+    entry_data = {
+        u'title': u'Hello',
+        u'text': u'This is a post',
+    }
+    actual = app.test_client().post(
+        '/add', data=entry_data, follow_redirects=True
+    ).data
+    assert 'No entries here so far' not in actual
+    for expected in entry_data.values():
+        assert expected in actual
