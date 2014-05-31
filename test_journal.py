@@ -7,7 +7,6 @@ from journal import connect_db
 from journal import get_database_connection
 from journal import init_db
 
-
 TEST_DSN = 'dbname=test_learning_journal user=cewing'
 
 
