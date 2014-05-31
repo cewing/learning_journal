@@ -34,6 +34,12 @@ app = Flask(__name__)
 app.config['DATABASE'] = os.environ.get(
     'DATABASE_URL', 'dbname=learning_journal user=cewing'
 )
+app.config['ADMIN_USERNAME'] = os.environ.get(
+    'ADMIN_USERNAME', 'admin'
+)
+app.config['ADMIN_PASSWORD'] = os.environ.get(
+    'ADMIN_PASSWORD', 'admin'
+)
 
 
 def connect_db():
