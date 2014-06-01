@@ -71,11 +71,9 @@ def get_database_connection():
 
 @app.teardown_request
 def teardown_request(exception):
-    print "this is teardown request"
     db = getattr(g, 'db', None)
     if db is not None:
         if exception and isinstance(exception, psycopg2.Error):
-            print "exception %r will cause db rollback" % exception
             # if there was a problem, rollback any existing transaction
             db.rollback()
         else:
