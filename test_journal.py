@@ -180,3 +180,14 @@ def test_login_fails(db):
     username, password = ('admin', 'wrong')
     response = login_helper(username, password)
     assert 'Login Failed' in response.data
+
+
+def test_logout(db):
+    home = login_helper('admin', 'admin').data
+    assert SUBMIT_BTN in home
+    client = app.test_client()
+    response = client.get('/logout')
+    assert SUBMIT_BTN not in response.data
+    assert response.status_code == 302
+
+
