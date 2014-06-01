@@ -71,6 +71,9 @@ def get_database_connection():
 
 @app.teardown_request
 def teardown_request(exception):
+    print "this is teardown request"
+    if exception:
+        print "There is an exception, which will cause db rollback: %r" % exception
     db = getattr(g, 'db', None)
     if db is not None:
         if exception:
