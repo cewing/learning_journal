@@ -9,6 +9,15 @@
   </head>
   <body>
     <header>
+      <aside id="user-controls">
+        <ul>
+        {% if not session.logged_in %}
+          <li><a href="{{ url_for('login') }}">log in</a></li>
+        {% else %}
+          <li><a href="{{ url_for('logout') }}">log out</a></li>
+        {% endif %}
+        </ul>
+      </aside>
       <nav>
         <ul>
           <li><a href="/">Home</a></li>
