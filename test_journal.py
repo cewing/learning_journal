@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from contextlib import closing
 from flask import session
-from flask import url_for
+import os
 import pytest
 
 from journal import app
@@ -9,7 +9,10 @@ from journal import connect_db
 from journal import get_database_connection
 from journal import init_db
 
-TEST_DSN = 'dbname=test_learning_journal user=cewing'
+
+TEST_DSN = os.environ.get(
+    'DATABASE_URL', 'dbname=test_learning_journal user=cewing'
+)
 
 
 def clear_db():
@@ -93,7 +96,6 @@ def test_write_entry(req_context):
 
 def test_write_unicode_entry(req_context):
     from journal import write_entry
-    import pdb; pdb.set_trace()
     expected = (u"Hüsker Dü", u"Had a great deal of élan")
     write_entry(*expected)
     rows = run_independent_query("SELECT * FROM entries")
