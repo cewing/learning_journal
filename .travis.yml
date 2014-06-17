@@ -9,4 +9,4 @@ script:
  - py.test
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
-env: DATABSE_URL="dbname=travis_ci_test user=postgres"
+env: DATABASE_URL="dbname=travis_ci_test user=postgres"
