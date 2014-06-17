@@ -45,6 +45,14 @@ def req_context(db):
         con.rollback()
 
 
+@pytest.yield_fixture(scope='function')
+def authenticated_client(db):
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['logged_in'] = True
+        yield client
+
+
 @pytest.fixture(scope='function')
 def with_entry(db, request):
     from journal import write_entry
@@ -114,12 +122,12 @@ def test_listing(with_entry):
         assert value in actual
 
 
-def test_add_entries(db):
+def test_add_entries(authenticated_client):
     entry_data = {
         u'title': u'Hello',
         u'text': u'This is a post',
     }
-    actual = app.test_client().post(
+    actual = authenticated_client.post(
         '/add', data=entry_data, follow_redirects=True
     ).data
     assert 'No entries here so far' not in actual
