@@ -12,6 +12,13 @@ from flask import url_for
 import os
 from passlib.hash import pbkdf2_sha256
 import psycopg2
+import psycopg2.extensions
+
+
+# ensure that all data received from postgresql is unicode on arrival
+# (see http://initd.org/psycopg/docs/usage.html#unicode-handling)
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
 
 
 DB_SCHEMA = """
