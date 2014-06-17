@@ -7,3 +7,6 @@ install: "pip install -r requirements.txt"
 script:
  - lettuce
  - py.test
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+env: DATABSE_URI="dbname=travis_ci_test user=postgres"
