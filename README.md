@@ -2,6 +2,8 @@
 
 *A lightweight Flask web journal*
 
+[![TravisCI Build Status](https://travis-ci.org/cewing/learning_journal.svg?branch=master)](https://travis-ci.org/cewing/learning_journal.svg?branch=master)
+
 This journal project is intended as a demonstration of basic Flask usage. It is
 part of the course materials developed for the Code Fellows Python Dev
 Accelerator course.
