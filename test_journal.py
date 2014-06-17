@@ -91,6 +91,17 @@ def test_write_entry(req_context):
         assert val in rows[0]
 
 
+def test_write_unicode_entry(req_context):
+    from journal import write_entry
+    import pdb; pdb.set_trace()
+    expected = (u"Hüsker Dü", u"Had a great deal of élan")
+    write_entry(*expected)
+    rows = run_independent_query("SELECT * FROM entries")
+    assert len(rows) == 1
+    for val in expected:
+        assert val in rows[0]
+
+
 def test_get_all_entries_empty(req_context):
     from journal import get_all_entries
     entries = get_all_entries()
