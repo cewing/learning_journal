@@ -132,3 +132,20 @@ def test_listing(app, entry):
     for field in ['title', 'text']:
         expected = getattr(entry, field, 'absent')
         assert expected in actual
+
+
+def test_post_to_add_view(app):
+    entry_data = {
+        'title': 'Hello there',
+        'text': 'This is a post',
+    }
+    response = app.post('/add', params=entry_data, status='3*')
+    redirected = response.follow()
+    actual = redirected.body
+    for expected in entry_data.values():
+        assert expected in actual
+
+
+def test_add_no_params(app):
+    response = app.post('/add', status=500)
+    assert 'IntegrityError' in response.body
