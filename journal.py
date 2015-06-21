@@ -51,11 +51,10 @@ class Entry(Base):
         return session.query(cls).order_by(cls.created.desc()).all()
 
 
-
-
-@view_config(route_name='home', renderer='string')
-def home(request):
-    return "Hello World"
+@view_config(route_name='home', renderer='templates/list.jinja2')
+def list_view(request):
+    entries = Entry.all()
+    return {'entries': entries}
 
 
 def main():
@@ -64,13 +63,16 @@ def main():
     debug = os.environ.get('DEBUG', True)
     settings['reload_all'] = debug
     settings['debug_all'] = debug
-    engine = sa.create_engine(DATABASE_URL)
-    DBSession.configure(bind=engine)
+    if not DBSession.bind:
+        # only bind the session if it isn't already bound, for testing
+        engine = sa.create_engine(DATABASE_URL)
+        DBSession.configure(bind=engine)
     # configuration setup
     config = Configurator(
         settings=settings
     )
     config.include('pyramid_tm')
+    config.include('pyramid_jinja2')
     config.add_route('home', '/')
     config.scan()
     app = config.make_wsgi_app()
