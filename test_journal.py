@@ -10,6 +10,7 @@ TEST_DATABASE_URL = os.environ.get(
     'postgresql://cewing:@localhost:5432/test-learning-journal'
 )
 os.environ['DATABASE_URL'] = TEST_DATABASE_URL
+os.environ['TESTING'] = "True"
 
 import journal
 
