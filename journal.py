@@ -7,6 +7,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
+from pyramid.security import remember, forget
 from pyramid.view import view_config
 from waitress import serve
 import sqlalchemy as sa
@@ -17,10 +18,8 @@ from zope.sqlalchemy import ZopeTransactionExtension
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-
-
 Base = declarative_base()
-
+HERE = os.path.dirname(os.path.abspath(__file__))
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
     'postgresql://cewing:@localhost:5432/learning-journal'
@@ -92,6 +91,32 @@ def db_exception(context, request):
     return response
 
 
+@view_config(route_name='login', renderer="templates/login.jinja2")
+def login(request):
+    """authenticate a user by username/password"""
+    username = request.params.get('username', '')
+    error = ''
+    if request.method == 'POST':
+        error = "Login Failed"
+        authenticated = False
+        try:
+            authenticated = do_login(request)
+        except ValueError as e:
+            error = str(e)
+
+        if authenticated:
+            headers = remember(request, username)
+            return HTTPFound(request.route_url('home'), headers=headers)
+
+    return {'error': error, 'username': username}
+
+
+@view_config(route_name='logout')
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(request.route_url('home'), headers=headers)
+
+
 def main():
     """Create a configured wsgi app"""
     settings = {}
@@ -107,9 +132,7 @@ def main():
         # only bind the session if we are not testing
         engine = sa.create_engine(DATABASE_URL)
         DBSession.configure(bind=engine)
-    # add a secret value for auth tkt signing
     auth_secret = os.environ.get('JOURNAL_AUTH_SECRET', 'itsaseekrit')
-    # and add a new value to the constructor for our Configurator:
     config = Configurator(
         settings=settings,
         authentication_policy=AuthTktAuthenticationPolicy(
@@ -118,14 +141,13 @@ def main():
         ),
         authorization_policy=ACLAuthorizationPolicy(),
     )
-    # configuration setup
-    config = Configurator(
-        settings=settings
-    )
     config.include('pyramid_tm')
     config.include('pyramid_jinja2')
+    config.add_static_view('static', os.path.join(HERE, 'static'))
     config.add_route('home', '/')
     config.add_route('add', '/add')
+    config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
     config.scan()
     app = config.make_wsgi_app()
     return app
