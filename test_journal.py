@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from cryptacular.bcrypt import BCRYPTPasswordManager
 import os
 import pytest
+from pyramid import testing
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 
@@ -45,6 +47,7 @@ def app():
     app = main()
     return TestApp(app)
 
+
 @pytest.fixture()
 def entry(db_session):
     entry = journal.Entry.write(
@@ -54,6 +57,24 @@ def entry(db_session):
     )
     db_session.flush()
     return entry
+
+
+@pytest.fixture(scope='function')
+def auth_req(request):
+    manager = BCRYPTPasswordManager()
+    settings = {
+        'auth.username': 'admin',
+        'auth.password': manager.encode('secret'),
+    }
+    testing.setUp(settings=settings)
+    req = testing.DummyRequest()
+
+    def cleanup():
+        testing.tearDown()
+
+    request.addfinalizer(cleanup)
+
+    return req
 
 
 def test_write_entry(db_session):
@@ -149,3 +170,29 @@ def test_post_to_add_view(app):
 def test_add_no_params(app):
     response = app.post('/add', status=500)
     assert 'IntegrityError' in response.body
+
+
+def test_do_login_success(auth_req):
+    from journal import do_login
+    auth_req.params = {'username': 'admin', 'password': 'secret'}
+    assert do_login(auth_req)
+
+
+def test_do_login_bad_pass(auth_req):
+    from journal import do_login
+    auth_req.params = {'username': 'admin', 'password': 'wrong'}
+    assert not do_login(auth_req)
+
+
+def test_do_login_bad_user(auth_req):
+    from journal import do_login
+    auth_req.params = {'username': 'bad', 'password': 'secret'}
+    assert not do_login(auth_req)
+
+
+def test_do_login_missing_params(auth_req):
+    from journal import do_login
+    for params in ({'username': 'admin'}, {'password': 'secret'}):
+        auth_req.params = params
+        with pytest.raises(ValueError):
+            do_login(auth_req)
