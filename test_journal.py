@@ -41,7 +41,7 @@ def db_session(request, connection):
 
 
 @pytest.fixture()
-def app():
+def app(db_session):
     from journal import main
     from webtest import TestApp
     app = main()
