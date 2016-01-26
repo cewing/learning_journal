@@ -110,7 +110,7 @@ def test_read_entries_one(db_session):
 def test_empty_listing(app):
     response = app.get('/')
     assert response.status_code == 200
-    actual = response.body
+    actual = response.text
     expected = 'No entries here so far'
     assert expected in actual
 
@@ -118,7 +118,7 @@ def test_empty_listing(app):
 def test_listing(app, entry):
     response = app.get('/')
     assert response.status_code == 200
-    actual = response.body
+    actual = response.text
     for field in ['title', 'text']:
         expected = getattr(entry, field, 'absent')
         assert expected in actual
@@ -131,14 +131,14 @@ def test_post_to_add_view(app):
     }
     response = app.post('/add', params=entry_data, status='3*')
     redirected = response.follow()
-    actual = redirected.body
+    actual = redirected.text
     for expected in entry_data.values():
         assert expected in actual
 
 
 def test_add_no_params(app):
     response = app.post('/add', status=500)
-    assert 'IntegrityError' in response.body
+    assert 'IntegrityError' in response.text
 
 
 def test_do_login_success(auth_req):
@@ -181,7 +181,7 @@ def login_helper(username, password, app):
 
 def test_start_as_anonymous(app):
     response = app.get('/', status=200)
-    actual = response.body
+    actual = response.text
     assert INPUT_BTN not in actual
 
 
@@ -191,7 +191,7 @@ def test_login_success(app):
     assert redirect.status_code == 302
     response = redirect.follow()
     assert response.status_code == 200
-    actual = response.body
+    actual = response.text
     assert INPUT_BTN in actual
 
 
@@ -199,7 +199,7 @@ def test_login_fails(app):
     username, password = ('admin', 'wrong')
     response = login_helper(username, password, app)
     assert response.status_code == 200
-    actual = response.body
+    actual = response.text
     assert "Login Failed" in actual
     assert INPUT_BTN not in actual
 
@@ -210,5 +210,5 @@ def test_logout(app):
     redirect = app.get('/logout', status="3*")
     response = redirect.follow()
     assert response.status_code == 200
-    actual = response.body
+    actual = response.text
     assert INPUT_BTN not in actual
