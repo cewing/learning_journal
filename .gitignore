@@ -19,7 +19,9 @@ include/
 lib/
 lib64/
 parts/
+pip-selfcheck.json
 sdist/
+share/
 var/
 *.egg-info/
 .installed.cfg
