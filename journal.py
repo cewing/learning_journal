@@ -86,7 +86,7 @@ def add_entry(request):
 @view_config(context=DBAPIError)
 def db_exception(context, request):
     from pyramid.response import Response
-    response = Response(context.message)
+    response = Response(str(context))
     response.status_int = 500
     return response
 
